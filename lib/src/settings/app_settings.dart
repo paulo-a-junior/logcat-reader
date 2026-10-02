@@ -27,6 +27,7 @@ class AppSettings extends ChangeNotifier {
   static const _kNotifyReconnected = 'notifyReconnected';
   static const _kNotifyCrash = 'notifyCrash';
   static const _kLanguage = 'language';
+  static const _kAdbPath = 'adbPath';
 
   final SharedPreferences _prefs;
 
@@ -38,8 +39,11 @@ class AppSettings extends ChangeNotifier {
   late bool _notifyReconnected;
   late bool _notifyCrash;
   late String? _language;
+  late String? _adbPath;
 
   void _load() {
+    final adbPath = _prefs.getString(_kAdbPath)?.trim();
+    _adbPath = adbPath == null || adbPath.isEmpty ? null : adbPath;
     _autoReconnect = _prefs.getBool(_kAutoReconnect) ?? true;
     _longLineMode =
         LongLineMode.values.asNameMap()[_prefs.getString(_kLongLineMode)] ??
@@ -65,10 +69,26 @@ class AppSettings extends ChangeNotifier {
       _kNotifyReconnected,
       _kNotifyCrash,
       _kLanguage,
+      _kAdbPath,
     ]) {
       await _prefs.remove(key);
     }
     _load();
+    notifyListeners();
+  }
+
+  /// Path to the adb executable, or `null` to use `$ADB` / `adb` on `PATH`.
+  String? get adbPath => _adbPath;
+  set adbPath(String? v) {
+    v = v?.trim();
+    if (v != null && v.isEmpty) v = null;
+    if (v == _adbPath) return;
+    _adbPath = v;
+    if (v == null) {
+      _prefs.remove(_kAdbPath);
+    } else {
+      _prefs.setString(_kAdbPath, v);
+    }
     notifyListeners();
   }
 

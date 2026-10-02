@@ -74,7 +74,16 @@ class _LogcatReaderAppState extends State<LogcatReaderApp> {
     if (_controller.autoReconnect != _settings.autoReconnect) {
       _controller.autoReconnect = _settings.autoReconnect;
     }
+    final adb = _controller.adb;
+    if (adb.customPath != _settings.adbPath) {
+      adb.customPath = _settings.adbPath;
+      // The toolbar lists devices on startup; later changes need a reload.
+      if (_started) _devices.refresh();
+    }
+    _started = true;
   }
+
+  bool _started = false;
 
   @override
   void dispose() {

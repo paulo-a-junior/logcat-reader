@@ -380,7 +380,7 @@ abstract class AppLocalizations {
   /// No description provided for @adbNotFound.
   ///
   /// In en, this message translates to:
-  /// **'Could not run \"{adb}\". Make sure adb is on PATH or set the ADB environment variable.'**
+  /// **'Could not run \"{adb}\". Choose the adb executable in Preferences, put adb on PATH or set the ADB environment variable.'**
   String adbNotFound(String adb);
 
   /// No description provided for @notifyConnectionLost.
@@ -442,6 +442,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resume logcat when the device disconnects or reboots'**
   String get autoReconnectSubtitle;
+
+  /// No description provided for @adbPath.
+  ///
+  /// In en, this message translates to:
+  /// **'adb executable'**
+  String get adbPath;
+
+  /// No description provided for @adbPathSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to use the ADB environment variable or adb from PATH'**
+  String get adbPathSubtitle;
+
+  /// No description provided for @adbPathHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Default: {path}'**
+  String adbPathHint(String path);
+
+  /// No description provided for @adbPathBrowse.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse…'**
+  String get adbPathBrowse;
+
+  /// No description provided for @adbPathUseDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Use default'**
+  String get adbPathUseDefault;
+
+  /// No description provided for @adbPathCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check adb'**
+  String get adbPathCheck;
+
+  /// No description provided for @adbPathChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get adbPathChecking;
 
   /// No description provided for @sectionDisplay.
   ///

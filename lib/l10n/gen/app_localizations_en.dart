@@ -185,7 +185,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String adbNotFound(String adb) {
-    return 'Could not run \"$adb\". Make sure adb is on PATH or set the ADB environment variable.';
+    return 'Could not run \"$adb\". Choose the adb executable in Preferences, put adb on PATH or set the ADB environment variable.';
   }
 
   @override
@@ -229,6 +229,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get autoReconnectSubtitle => 'Resume logcat when the device disconnects or reboots';
+
+  @override
+  String get adbPath => 'adb executable';
+
+  @override
+  String get adbPathSubtitle => 'Leave empty to use the ADB environment variable or adb from PATH';
+
+  @override
+  String adbPathHint(String path) {
+    return 'Default: $path';
+  }
+
+  @override
+  String get adbPathBrowse => 'Browse…';
+
+  @override
+  String get adbPathUseDefault => 'Use default';
+
+  @override
+  String get adbPathCheck => 'Check adb';
+
+  @override
+  String get adbPathChecking => 'Checking…';
 
   @override
   String get sectionDisplay => 'Display';

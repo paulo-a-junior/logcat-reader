@@ -185,7 +185,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String adbNotFound(String adb) {
-    return 'Não foi possível executar \"$adb\". Confirme que o adb está no PATH ou defina a variável de ambiente ADB.';
+    return 'Não foi possível executar \"$adb\". Escolha o executável do adb nas Preferências, coloque o adb no PATH ou defina a variável de ambiente ADB.';
   }
 
   @override
@@ -229,6 +229,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get autoReconnectSubtitle => 'Retomar o logcat quando o dispositivo desliga ou reinicia';
+
+  @override
+  String get adbPath => 'Executável do adb';
+
+  @override
+  String get adbPathSubtitle => 'Deixe vazio para usar a variável de ambiente ADB ou o adb do PATH';
+
+  @override
+  String adbPathHint(String path) {
+    return 'Predefinição: $path';
+  }
+
+  @override
+  String get adbPathBrowse => 'Procurar…';
+
+  @override
+  String get adbPathUseDefault => 'Usar predefinição';
+
+  @override
+  String get adbPathCheck => 'Verificar adb';
+
+  @override
+  String get adbPathChecking => 'A verificar…';
 
   @override
   String get sectionDisplay => 'Apresentação';

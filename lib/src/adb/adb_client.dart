@@ -65,12 +65,51 @@ class RemoteFile {
 
 /// Thin wrapper around the `adb` command line tool.
 class AdbClient {
-  AdbClient({String? adbPath})
-      : adbPath = adbPath ?? Platform.environment['ADB'] ?? 'adb';
+  AdbClient({String? adbPath}) {
+    customPath = adbPath;
+  }
 
-  final String adbPath;
+  /// adb used when no custom path is set: `$ADB`, else `adb` from `PATH`.
+  static String get defaultPath {
+    final env = Platform.environment['ADB']?.trim();
+    return env == null || env.isEmpty ? 'adb' : env;
+  }
+
+  String? _customPath;
+
+  /// User-chosen adb executable; `null` or empty falls back to
+  /// [defaultPath]. Applies to commands started after the change.
+  String? get customPath => _customPath;
+  set customPath(String? path) {
+    path = path?.trim();
+    _customPath = path == null || path.isEmpty ? null : path;
+  }
+
+  String get adbPath => _customPath ?? defaultPath;
 
   static const _codec = Utf8Codec(allowMalformed: true);
+
+  /// First line of `adb version` for [path] (default: the current adb).
+  static Future<String> version([String? path]) async {
+    path ??= defaultPath;
+    try {
+      final r = await Process.run(path, ['version'],
+          stdoutEncoding: _codec, stderrEncoding: _codec);
+      if (r.exitCode != 0) {
+        throw AdbException('${r.stderr}'.trim().isEmpty
+            ? 'adb version exited with ${r.exitCode}'
+            : '${r.stderr}'.trim());
+      }
+      final out = LineSplitter.split(r.stdout as String)
+          .map((l) => l.trim())
+          .where((l) => l.isNotEmpty)
+          .toList();
+      final ver = out.where((l) => l.startsWith('Version ')).firstOrNull;
+      return [if (out.isNotEmpty) out.first, if (ver != null) ver].join(' · ');
+    } on ProcessException catch (e) {
+      throw AdbNotFoundException(path, e.message);
+    }
+  }
 
   Future<ProcessResult> _run(List<String> args) async {
     try {

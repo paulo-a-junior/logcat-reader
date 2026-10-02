@@ -75,6 +75,7 @@ saved with `shared_preferences`.
 
 | Setting | Options |
 |---------|---------|
+| adb executable | Path to `adb`, with a file picker and version check; empty (default) uses `$ADB`, then `adb` on `PATH` |
 | Auto-reconnect | on (default) / off |
 | Theme | System (default) / Light / Dark |
 | Long lines | Ellipsis (default) / Wrap |
@@ -89,7 +90,8 @@ offline files. Unresolved PIDs are shown as a bare number.
 ## Requirements
 
 - Flutter 3.27+.
-- `adb` on `PATH`, or set the `ADB` environment variable to its full path.
+- `adb`: choose it in Preferences, put it on `PATH`, or set the `ADB`
+  environment variable to its full path.
 - macOS: the App Sandbox is disabled in `macos/Runner/*.entitlements` so the
   app can launch `adb`.
 
