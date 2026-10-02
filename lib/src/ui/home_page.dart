@@ -53,6 +53,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _rawTable = LogTableController();
+  final _filteredTable = LogTableController();
   late final StreamSubscription<LogEvent> _events;
   int? _selectedLine;
   AppView _view = AppView.logs;
@@ -183,6 +184,11 @@ class _HomePageState extends State<HomePage> {
             _openPreferences,
         const SingleActivator(LogicalKeyboardKey.keyS, control: true): _saveLog,
         const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveLog,
+        // A focused table opens its own find bar; otherwise use the raw one.
+        const SingleActivator(LogicalKeyboardKey.keyF, control: true):
+            _rawTable.openFind,
+        const SingleActivator(LogicalKeyboardKey.keyF, meta: true):
+            _rawTable.openFind,
       },
       child: Focus(
         autofocus: true,
@@ -308,6 +314,7 @@ class _HomePageState extends State<HomePage> {
                 child: LogTable(
                   title: l10n.tableRaw,
                   controller: _rawTable,
+                  contentVersion: _c.entriesVersion,
                   itemCount: _c.entries.length,
                   entryAt: (i) => _c.entries[i],
                   processLabel: _c.processLabel,
@@ -340,6 +347,8 @@ class _HomePageState extends State<HomePage> {
                       ? l10n.tableFiltered
                       : '${l10n.tableFiltered} — '
                           '${l10n.noActiveFilters}',
+                  controller: _filteredTable,
+                  contentVersion: _c.filteredVersion,
                   itemCount: _c.filtered.length,
                   entryAt: (i) => _c.entries[_c.filtered[i]],
                   markColorAt: (i) {

@@ -323,6 +323,66 @@ abstract class AppLocalizations {
   /// **'Select all'**
   String get selectAll;
 
+  /// No description provided for @find.
+  ///
+  /// In en, this message translates to:
+  /// **'Find'**
+  String get find;
+
+  /// No description provided for @findHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Find in this table'**
+  String get findHint;
+
+  /// No description provided for @findPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous match (Shift+Enter)'**
+  String get findPrevious;
+
+  /// No description provided for @findNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next match (Enter)'**
+  String get findNext;
+
+  /// No description provided for @findMatchCase.
+  ///
+  /// In en, this message translates to:
+  /// **'Match case'**
+  String get findMatchCase;
+
+  /// No description provided for @findRegex.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular expression'**
+  String get findRegex;
+
+  /// No description provided for @findNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get findNoResults;
+
+  /// No description provided for @findInvalidRegex.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid regular expression'**
+  String get findInvalidRegex;
+
+  /// No description provided for @findMatchCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 match} other{{count} matches}}'**
+  String findMatchCount(int count);
+
+  /// No description provided for @findMatchPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {total}'**
+  String findMatchPosition(int current, int total);
+
   /// No description provided for @followingNewLines.
   ///
   /// In en, this message translates to:

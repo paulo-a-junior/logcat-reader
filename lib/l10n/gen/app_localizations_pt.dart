@@ -195,6 +195,54 @@ class AppLocalizationsPt extends AppLocalizations {
   String get selectAll => 'Selecionar tudo';
 
   @override
+  String get find => 'Procurar';
+
+  @override
+  String get findHint => 'Procurar nesta tabela';
+
+  @override
+  String get findPrevious => 'Resultado anterior (Shift+Enter)';
+
+  @override
+  String get findNext => 'Resultado seguinte (Enter)';
+
+  @override
+  String get findMatchCase => 'Diferenciar maiúsculas';
+
+  @override
+  String get findRegex => 'Expressão regular';
+
+  @override
+  String get findNoResults => 'Sem resultados';
+
+  @override
+  String get findInvalidRegex => 'Expressão regular inválida';
+
+  @override
+  String findMatchCount(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString resultados',
+      one: '1 resultado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String findMatchPosition(int current, int total) {
+    final intl.NumberFormat currentNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String currentString = currentNumberFormat.format(current);
+    final intl.NumberFormat totalNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$currentString de $totalString';
+  }
+
+  @override
   String get followingNewLines => 'A seguir novas linhas';
 
   @override

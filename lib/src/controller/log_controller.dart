@@ -41,6 +41,13 @@ class LogController extends ChangeNotifier {
 
   final List<LogEntry> entries = [];
 
+  /// Bumped whenever [entries] is replaced rather than appended to (new
+  /// source or clear), so views can drop state derived from row indices.
+  int entriesVersion = 0;
+
+  /// Like [entriesVersion], for [filtered]; also bumped on filter changes.
+  int filteredVersion = 0;
+
   /// Indices into [entries] that match the active filters.
   final List<int> filtered = [];
 
@@ -195,6 +202,7 @@ class LogController extends ChangeNotifier {
   }
 
   void _refilter() {
+    filteredVersion++;
     filtered.clear();
     filteredMarks.clear();
     if (!hasActiveFilters) return;
@@ -473,6 +481,8 @@ class LogController extends ChangeNotifier {
   }
 
   void clear() {
+    entriesVersion++;
+    filteredVersion++;
     entries.clear();
     filtered.clear();
     filteredMarks.clear();
@@ -503,6 +513,8 @@ class LogController extends ChangeNotifier {
   }
 
   void _reset() {
+    entriesVersion++;
+    filteredVersion++;
     entries.clear();
     filtered.clear();
     filteredMarks.clear();

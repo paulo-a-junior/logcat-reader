@@ -19,6 +19,9 @@ import 'l10n_helpers.dart';
 /// changes. Right-click or Ctrl+C copies it. Arrow keys move the selection
 /// by one row and Page Up/Down by [pageRows]; with Shift they extend it.
 ///
+/// Ctrl/Cmd+F opens a find bar that searches the table's rows (raw text and
+/// process name), highlights the matches and steps through them.
+///
 /// With [wrap] off every row has the same height and a plain [ListView] with
 /// a fixed extent is used; with [wrap] on rows have variable height and
 /// [SuperListView] keeps jumping to an index accurate.
@@ -35,6 +38,7 @@ class LogTable extends StatefulWidget {
     this.onRowTap,
     this.controller,
     this.markColorAt,
+    this.contentVersion = 0,
   });
 
   /// Rows moved by one Page Up/Down stroke.
@@ -57,6 +61,10 @@ class LogTable extends StatefulWidget {
   /// Optional colour stripe drawn at the start of each row.
   final Color? Function(int index)? markColorAt;
 
+  /// Must change whenever existing rows are replaced (rather than rows
+  /// being appended), so find results are recomputed.
+  final int contentVersion;
+
   @override
   State<LogTable> createState() => _LogTableState();
 }
@@ -66,6 +74,9 @@ class LogTableController {
   _LogTableState? _state;
 
   void revealIndex(int index) => _state?._revealIndex(index);
+
+  /// Opens the find bar (or focuses it if it is already open).
+  void openFind() => _state?._openFind();
 }
 
 class _LogTableState extends State<LogTable> {
@@ -98,6 +109,25 @@ class _LogTableState extends State<LogTable> {
   LogEntry? _downEntry;
   Offset? _dragPosition;
   Timer? _autoScroll;
+
+  // Find bar. [_matches] holds the sorted indices of matching rows among
+  // the first [_scanned] rows; large tables are scanned in chunks.
+  bool _findOpen = false;
+  final _findText = TextEditingController();
+  final _findFocus = FocusNode(debugLabel: 'LogTable find');
+  bool _findCase = false;
+  bool _findRegex = false;
+  RegExp? _findPattern;
+  bool _findInvalid = false;
+  final List<int> _matches = [];
+  int _scanned = 0;
+  Timer? _scanTimer;
+  Timer? _findDebounce;
+
+  /// While set, jump to the first match at or after this row once found.
+  int? _pendingJump;
+
+  static const _scanChunk = 20000;
 
   double get _rowHeight => widget.fontSize * 1.2 + 5;
   double get _charWidth => widget.fontSize * 0.62;
@@ -132,6 +162,12 @@ class _LogTableState extends State<LogTable> {
     }
     // Line numbers restart after the log is cleared or a new source opens.
     if (widget.itemCount == 0) _selectOnly(null);
+    if (widget.contentVersion != old.contentVersion ||
+        widget.itemCount < old.itemCount) {
+      _rescan();
+    } else if (widget.itemCount > _scanned && _scanTimer == null) {
+      _scanMore();
+    }
     if (_follow &&
         (widget.itemCount != old.itemCount ||
             widget.wrap != old.wrap ||
@@ -143,6 +179,10 @@ class _LogTableState extends State<LogTable> {
   @override
   void dispose() {
     _autoScroll?.cancel();
+    _scanTimer?.cancel();
+    _findDebounce?.cancel();
+    _findText.dispose();
+    _findFocus.dispose();
     _focusNode.dispose();
     widget.controller?._state = null;
     _vertical.dispose();
@@ -240,6 +280,15 @@ class _LogTableState extends State<LogTable> {
                   style: theme.textTheme.labelSmall),
               const SizedBox(width: 4),
               IconButton(
+                tooltip: '${l10n.find} (Ctrl+F)',
+                iconSize: 16,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                isSelected: _findOpen,
+                icon: const Icon(Icons.search),
+                onPressed: _findOpen ? _closeFind : _openFind,
+              ),
+              IconButton(
                 tooltip: _follow ? l10n.followingNewLines : l10n.followNewLines,
                 iconSize: 16,
                 visualDensity: VisualDensity.compact,
@@ -251,6 +300,7 @@ class _LogTableState extends State<LogTable> {
             ],
           ),
         ),
+        if (_findOpen) _buildFindBar(theme),
         Expanded(
           child: Focus(
             focusNode: _focusNode,
@@ -292,6 +342,162 @@ class _LogTableState extends State<LogTable> {
         ),
       ],
     );
+  }
+
+  Widget _buildFindBar(ThemeData theme) {
+    final l10n = context.l10n;
+    final colors = theme.colorScheme;
+    final pattern = _findPattern;
+    final position = pattern == null ? null : _matchPosition;
+    final more = _scanning ? '+' : '';
+    var status = '';
+    var bad = false;
+    if (_findInvalid) {
+      (status, bad) = (l10n.findInvalidRegex, true);
+    } else if (pattern == null) {
+      // Empty query.
+    } else if (_matches.isEmpty) {
+      (status, bad) = (_scanning ? '…' : l10n.findNoResults, !_scanning);
+    } else if (position != null) {
+      status = '${l10n.findMatchPosition(position, _matches.length)}$more';
+    } else {
+      status = '${l10n.findMatchCount(_matches.length)}$more';
+    }
+    final hasMatches = _matches.isNotEmpty;
+
+    Widget toggle(String label, String tooltip, bool value,
+            ValueChanged<bool> onChanged) =>
+        IconButton(
+          tooltip: tooltip,
+          isSelected: value,
+          visualDensity: VisualDensity.compact,
+          iconSize: 16,
+          icon: Text(label,
+              style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                  color: value ? colors.primary : null)),
+          onPressed: () {
+            onChanged(!value);
+            _applyQuery();
+          },
+        );
+
+    return Container(
+      color: colors.surfaceContainer,
+      padding: const EdgeInsets.fromLTRB(8, 4, 4, 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: CallbackShortcuts(
+              bindings: {
+                const SingleActivator(LogicalKeyboardKey.enter): () =>
+                    _findStep(forward: true),
+                const SingleActivator(LogicalKeyboardKey.numpadEnter): () =>
+                    _findStep(forward: true),
+                const SingleActivator(LogicalKeyboardKey.enter, shift: true):
+                    () => _findStep(forward: false),
+                const SingleActivator(LogicalKeyboardKey.f3): () =>
+                    _findStep(forward: true),
+                const SingleActivator(LogicalKeyboardKey.f3, shift: true): () =>
+                    _findStep(forward: false),
+                const SingleActivator(LogicalKeyboardKey.escape): _closeFind,
+                const SingleActivator(LogicalKeyboardKey.keyF, control: true):
+                    _openFind,
+                const SingleActivator(LogicalKeyboardKey.keyF, meta: true):
+                    _openFind,
+              },
+              child: TextField(
+                controller: _findText,
+                focusNode: _findFocus,
+                onChanged: _onFindChanged,
+                style: theme.textTheme.bodyMedium,
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: l10n.findHint,
+                  prefixIcon: const Icon(Icons.search, size: 18),
+                  prefixIconConstraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: bad && _findText.text.isNotEmpty
+                            ? colors.error
+                            : colors.outline),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 90),
+            child: Text(status,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelMedium
+                    ?.copyWith(color: bad ? colors.error : null)),
+          ),
+          toggle('Aa', l10n.findMatchCase, _findCase, (v) => _findCase = v),
+          toggle('.*', l10n.findRegex, _findRegex, (v) => _findRegex = v),
+          IconButton(
+            tooltip: l10n.findPrevious,
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.keyboard_arrow_up),
+            onPressed: hasMatches ? () => _findStep(forward: false) : null,
+          ),
+          IconButton(
+            tooltip: l10n.findNext,
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.keyboard_arrow_down),
+            onPressed: hasMatches ? () => _findStep(forward: true) : null,
+          ),
+          IconButton(
+            tooltip: '${l10n.close} (Esc)',
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.close),
+            onPressed: _closeFind,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// [text] with the find matches highlighted, or plain when not finding.
+  Widget _text(String text, TextStyle style, ThemeData theme,
+      {required bool wrap}) {
+    final pattern = _findOpen ? _findPattern : null;
+    final maxLines = wrap ? null : 1;
+    final overflow = wrap ? null : TextOverflow.ellipsis;
+    if (pattern == null || text.isEmpty) {
+      return Text(text,
+          maxLines: maxLines, softWrap: wrap, overflow: overflow, style: style);
+    }
+    final highlight = style.copyWith(
+      backgroundColor: theme.brightness == Brightness.dark
+          ? const Color(0xFF8A6D00)
+          : const Color(0xFFFFE066),
+      color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+    );
+    final spans = <TextSpan>[];
+    var last = 0;
+    for (final m in pattern.allMatches(text)) {
+      if (m.end == m.start) continue;
+      if (m.start > last) {
+        spans.add(TextSpan(text: text.substring(last, m.start)));
+      }
+      spans.add(
+          TextSpan(text: text.substring(m.start, m.end), style: highlight));
+      last = m.end;
+    }
+    if (spans.isEmpty) {
+      return Text(text,
+          maxLines: maxLines, softWrap: wrap, overflow: overflow, style: style);
+    }
+    if (last < text.length) spans.add(TextSpan(text: text.substring(last)));
+    return Text.rich(TextSpan(style: style, children: spans),
+        maxLines: maxLines, softWrap: wrap, overflow: overflow);
   }
 
   // ---- Selection -------------------------------------------------------
@@ -403,6 +609,14 @@ class _LogTableState extends State<LogTable> {
       _selectAll();
       return KeyEventResult.handled;
     }
+    if (command && key == LogicalKeyboardKey.keyF) {
+      _openFind();
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.f3 && _findOpen) {
+      _findStep(forward: !keyboard.isShiftPressed);
+      return KeyEventResult.handled;
+    }
     final step = switch (key) {
       LogicalKeyboardKey.pageUp => -LogTable.pageRows,
       LogicalKeyboardKey.pageDown => LogTable.pageRows,
@@ -414,9 +628,15 @@ class _LogTableState extends State<LogTable> {
       _moveCursor(step, extend: keyboard.isShiftPressed);
       return KeyEventResult.handled;
     }
-    if (key == LogicalKeyboardKey.escape && _hasSelection) {
-      setState(() => _selectOnly(null));
-      return KeyEventResult.handled;
+    if (key == LogicalKeyboardKey.escape) {
+      if (_hasSelection) {
+        setState(() => _selectOnly(null));
+        return KeyEventResult.handled;
+      }
+      if (_findOpen) {
+        _closeFind();
+        return KeyEventResult.handled;
+      }
     }
     return KeyEventResult.ignored;
   }
@@ -503,6 +723,171 @@ class _LogTableState extends State<LogTable> {
     if (target != null) {
       _vertical.jumpTo(target.clamp(0.0, pos.maxScrollExtent));
     }
+  }
+
+  // ---- Find -------------------------------------------------------------
+
+  void _openFind() {
+    final wasOpen = _findOpen;
+    setState(() => _findOpen = true);
+    _findText.selection =
+        TextSelection(baseOffset: 0, extentOffset: _findText.text.length);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _findFocus.requestFocus();
+    });
+    if (!wasOpen) _rescan();
+  }
+
+  void _closeFind() {
+    _findDebounce?.cancel();
+    _scanTimer?.cancel();
+    _scanTimer = null;
+    setState(() {
+      _findOpen = false;
+      _matches.clear();
+      _scanned = 0;
+      _pendingJump = null;
+    });
+    _focusNode.requestFocus();
+  }
+
+  void _updatePattern() {
+    final query = _findText.text;
+    _findInvalid = false;
+    _findPattern = null;
+    if (query.isEmpty) return;
+    try {
+      _findPattern = RegExp(_findRegex ? query : RegExp.escape(query),
+          caseSensitive: _findCase);
+    } on FormatException {
+      _findInvalid = true;
+    }
+  }
+
+  /// Applies the query after a short pause in typing.
+  void _onFindChanged(String _) {
+    _findDebounce?.cancel();
+    _findDebounce =
+        Timer(const Duration(milliseconds: 150), () => _applyQuery());
+  }
+
+  /// Recomputes the matches and jumps to the first one at or after the
+  /// selection, like a browser's incremental find.
+  void _applyQuery() {
+    if (!mounted) return;
+    _findDebounce?.cancel();
+    setState(() {
+      _updatePattern();
+      _rescan(jumpFrom: _cursorRow().$1);
+    });
+  }
+
+  void _rescan({int? jumpFrom}) {
+    _scanTimer?.cancel();
+    _scanTimer = null;
+    _matches.clear();
+    _scanned = 0;
+    _pendingJump = jumpFrom;
+    _scanMore();
+  }
+
+  bool get _scanning => _scanTimer != null;
+
+  bool _rowMatches(RegExp pattern, int index) {
+    final e = widget.entryAt(index);
+    return pattern.hasMatch(e.raw) || pattern.hasMatch(widget.processLabel(e));
+  }
+
+  /// Scans the next chunk of rows; schedules itself until all are done.
+  void _scanMore() {
+    _scanTimer = null;
+    final pattern = _findPattern;
+    if (!_findOpen || pattern == null) {
+      _scanned = widget.itemCount;
+      _pendingJump = null;
+      return;
+    }
+    final end = math.min(widget.itemCount, _scanned + _scanChunk);
+    for (var i = _scanned; i < end; i++) {
+      if (_rowMatches(pattern, i)) _matches.add(i);
+    }
+    _scanned = end;
+    if (_scanned < widget.itemCount) {
+      _scanTimer = Timer(Duration.zero, () {
+        if (!mounted) return;
+        _scanMore();
+        setState(() {});
+      });
+    }
+    final from = _pendingJump;
+    if (from != null) {
+      final i = _firstAtOrAfter(_matches, from);
+      if (i < _matches.length) {
+        _pendingJump = null;
+        _gotoMatch(i, defer: true);
+      } else if (!_scanning) {
+        // Nothing after the cursor: wrap around to the first match.
+        _pendingJump = null;
+        if (_matches.isNotEmpty) _gotoMatch(0, defer: true);
+      }
+    }
+  }
+
+  /// First position in sorted [list] whose value is >= [value].
+  static int _firstAtOrAfter(List<int> list, int value) {
+    var lo = 0, hi = list.length;
+    while (lo < hi) {
+      final mid = (lo + hi) >> 1;
+      if (list[mid] < value) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    return lo;
+  }
+
+  /// Selects and reveals match [i]. With [defer], waits for the current
+  /// frame (scans can run from `didUpdateWidget` or a `setState` callback).
+  void _gotoMatch(int i, {bool defer = false}) {
+    final index = _matches[i];
+    if (!defer) {
+      _revealIndex(index);
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && index < widget.itemCount) _revealIndex(index);
+    });
+  }
+
+  /// Selects the next (or with [forward] false, previous) match relative to
+  /// the selection, wrapping around at either end.
+  void _findStep({required bool forward}) {
+    if (_findDebounce?.isActive ?? false) {
+      // Enter before the typing pause ended: search now.
+      _applyQuery();
+      return;
+    }
+    if (_matches.isEmpty) return;
+    final (row, exact) = _cursorRow();
+    int i;
+    if (forward) {
+      i = _firstAtOrAfter(_matches, exact ? row + 1 : row);
+      if (i >= _matches.length) i = 0;
+    } else {
+      i = _firstAtOrAfter(_matches, row) - 1;
+      if (i < 0) i = _matches.length - 1;
+    }
+    _gotoMatch(i);
+  }
+
+  /// Position (1-based) of the selected row among the matches, if it is
+  /// one.
+  int? get _matchPosition {
+    final (row, exact) = _cursorRow();
+    if (!exact || (_focusLine == null && _anchorLine == null)) return null;
+    final i = _firstAtOrAfter(_matches, row);
+    return i < _matches.length && _matches[i] == row ? i + 1 : null;
   }
 
   RenderBox? get _viewport =>
@@ -739,18 +1124,11 @@ class _LogTableState extends State<LogTable> {
                 ),
                 SizedBox(
                   width: _processColWidth,
-                  child: Text(widget.processLabel(entry),
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.ellipsis,
-                      style: style),
+                  child: _text(widget.processLabel(entry), style, theme,
+                      wrap: false),
                 ),
                 Expanded(
-                  child: Text(entry.displayMessage,
-                      maxLines: wrap ? null : 1,
-                      softWrap: wrap,
-                      overflow: wrap ? null : TextOverflow.ellipsis,
-                      style: style),
+                  child: _text(entry.displayMessage, style, theme, wrap: wrap),
                 ),
               ],
             ),

@@ -115,6 +115,36 @@
     }
   },
   "selectAll": "Select all",
+  "find": "Find",
+  "findHint": "Find in this table",
+  "findPrevious": "Previous match (Shift+Enter)",
+  "findNext": "Next match (Enter)",
+  "findMatchCase": "Match case",
+  "findRegex": "Regular expression",
+  "findNoResults": "No results",
+  "findInvalidRegex": "Invalid regular expression",
+  "findMatchCount": "{count, plural, =1{1 match} other{{count} matches}}",
+  "@findMatchCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "findMatchPosition": "{current} of {total}",
+  "@findMatchPosition": {
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
   "followingNewLines": "Following new lines",
   "followNewLines": "Follow new lines",
   "filterMessage": "Message",

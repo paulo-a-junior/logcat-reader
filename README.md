@@ -31,6 +31,15 @@ few everyday adb tools on the side.
   - Keyboard navigation: <kbd>Page Up</kbd>/<kbd>Page Down</kbd> move the
     selection 10 lines, <kbd>↑</kbd>/<kbd>↓</kbd> one line; with
     <kbd>Shift</kbd> they extend it. The table scrolls to keep it visible.
+  - **Find** — the search button in each table's header (or
+    <kbd>Ctrl</kbd>+<kbd>F</kbd>; it opens in the focused table, else the
+    raw one) shows a collapsible find bar. It searches each row's raw line
+    and process name as you type, highlights the matches and shows
+    "*n* of *total*". <kbd>Enter</kbd>/<kbd>F3</kbd> go to the next match,
+    <kbd>Shift</kbd>+<kbd>Enter</kbd>/<kbd>Shift</kbd>+<kbd>F3</kbd> to the
+    previous one (wrapping around); **Aa** toggles match case and **.\***
+    regular expressions; <kbd>Esc</kbd> closes it. Matches update as new
+    lines stream in and when the filters change.
 - **Save log** — the save button (or <kbd>Ctrl</kbd>+<kbd>S</kbd>) writes
   all lines, or only the filtered ones, as raw logcat text that can be
   reopened later.

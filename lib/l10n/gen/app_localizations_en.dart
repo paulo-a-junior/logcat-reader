@@ -195,6 +195,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectAll => 'Select all';
 
   @override
+  String get find => 'Find';
+
+  @override
+  String get findHint => 'Find in this table';
+
+  @override
+  String get findPrevious => 'Previous match (Shift+Enter)';
+
+  @override
+  String get findNext => 'Next match (Enter)';
+
+  @override
+  String get findMatchCase => 'Match case';
+
+  @override
+  String get findRegex => 'Regular expression';
+
+  @override
+  String get findNoResults => 'No results';
+
+  @override
+  String get findInvalidRegex => 'Invalid regular expression';
+
+  @override
+  String findMatchCount(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString matches',
+      one: '1 match',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String findMatchPosition(int current, int total) {
+    final intl.NumberFormat currentNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String currentString = currentNumberFormat.format(current);
+    final intl.NumberFormat totalNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$currentString of $totalString';
+  }
+
+  @override
   String get followingNewLines => 'Following new lines';
 
   @override
