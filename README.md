@@ -15,8 +15,16 @@ few everyday adb tools on the side.
   - **Filtered** (bottom) — only lines matching the enabled filters (empty
     when none is enabled), with a stripe in the matching filter's colour.
     Clicking a row scrolls the raw table to that line.
+  - Select rows with a click, <kbd>Shift</kbd>+click (scroll in between to
+    select far-apart lines) or click-and-drag (dragging past the top or
+    bottom edge auto-scrolls). Hold <kbd>Ctrl</kbd> (<kbd>Cmd</kbd> on
+    macOS) to build a non-contiguous selection: click toggles a single row,
+    drag adds a range, and <kbd>Shift</kbd> extends from the last clicked
+    row while keeping the rest. <kbd>Ctrl</kbd>+<kbd>A</kbd> selects all,
+    <kbd>Esc</kbd> clears the selection.
   - Right-click a row to copy the raw line, the message, the process name or
-    the whole row (tab-separated).
+    the whole row (tab-separated); with several rows selected it copies all
+    of them. <kbd>Ctrl</kbd>+<kbd>C</kbd> copies the selected raw lines.
 - **Save log** — the save button (or <kbd>Ctrl</kbd>+<kbd>S</kbd>) writes
   all lines, or only the filtered ones, as raw logcat text that can be
   reopened later.

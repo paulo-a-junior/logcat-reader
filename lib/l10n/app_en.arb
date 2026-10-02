@@ -78,6 +78,43 @@
   "copyProcessName": "Copy process name",
   "copyRow": "Copy row (line, process, message)",
   "copiedToClipboard": "Copied to clipboard",
+  "copyLines": "{count, plural, =1{Copy 1 line} other{Copy {count} lines}}",
+  "@copyLines": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "copyMessages": "{count, plural, =1{Copy 1 message} other{Copy {count} messages}}",
+  "@copyMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "copyRows": "{count, plural, =1{Copy 1 row (line, process, message)} other{Copy {count} rows (line, process, message)}}",
+  "@copyRows": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "selectedCount": "{count} selected",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "selectAll": "Select all",
   "followingNewLines": "Following new lines",
   "followNewLines": "Follow new lines",
   "filterMessage": "Message",

@@ -142,6 +142,59 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copiedToClipboard => 'Copied to clipboard';
 
   @override
+  String copyLines(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Copy $countString lines',
+      one: 'Copy 1 line',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String copyMessages(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Copy $countString messages',
+      one: 'Copy 1 message',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String copyRows(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Copy $countString rows (line, process, message)',
+      one: 'Copy 1 row (line, process, message)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String selectedCount(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString selected';
+  }
+
+  @override
+  String get selectAll => 'Select all';
+
+  @override
   String get followingNewLines => 'Following new lines';
 
   @override

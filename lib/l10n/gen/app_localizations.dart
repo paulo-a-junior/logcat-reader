@@ -293,6 +293,36 @@ abstract class AppLocalizations {
   /// **'Copied to clipboard'**
   String get copiedToClipboard;
 
+  /// No description provided for @copyLines.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Copy 1 line} other{Copy {count} lines}}'**
+  String copyLines(int count);
+
+  /// No description provided for @copyMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Copy 1 message} other{Copy {count} messages}}'**
+  String copyMessages(int count);
+
+  /// No description provided for @copyRows.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Copy 1 row (line, process, message)} other{Copy {count} rows (line, process, message)}}'**
+  String copyRows(int count);
+
+  /// No description provided for @selectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String selectedCount(int count);
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get selectAll;
+
   /// No description provided for @followingNewLines.
   ///
   /// In en, this message translates to:

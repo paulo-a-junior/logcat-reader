@@ -142,6 +142,59 @@ class AppLocalizationsPt extends AppLocalizations {
   String get copiedToClipboard => 'Copiado para a área de transferência';
 
   @override
+  String copyLines(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Copiar $countString linhas',
+      one: 'Copiar 1 linha',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String copyMessages(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Copiar $countString mensagens',
+      one: 'Copiar 1 mensagem',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String copyRows(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Copiar $countString linhas da tabela (linha, processo, mensagem)',
+      one: 'Copiar 1 linha da tabela (linha, processo, mensagem)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String selectedCount(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString selecionadas';
+  }
+
+  @override
+  String get selectAll => 'Selecionar tudo';
+
+  @override
   String get followingNewLines => 'A seguir novas linhas';
 
   @override
