@@ -99,6 +99,25 @@ offline files. Unresolved PIDs are shown as a bare number.
 flutter run -d linux     # or: -d macos / -d windows
 ```
 
+## Releases
+
+Pushing a tag of the form `vA.B.C` (e.g. `v1.2.0`) runs
+`.github/workflows/release.yml`, which builds release binaries on Linux,
+Windows and macOS runners and publishes a GitHub release with:
+
+- `logcat_reader-A.B.C-linux-x64.tar.gz`
+- `logcat_reader-A.B.C-windows-x64.zip`
+- `logcat_reader-A.B.C-macos.zip` (unsigned `.app`)
+- `SHA256SUMS.txt`
+
+The app version is taken from the tag (`--build-name A.B.C`), so
+`pubspec.yaml` does not need to be bumped. Other tags (`v1.2`, `v1.2.3-rc1`)
+are ignored.
+
+```sh
+git tag v1.2.0 && git push origin v1.2.0
+```
+
 ## Layout
 
 | Path | Purpose |

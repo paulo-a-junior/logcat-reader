@@ -1,0 +1,139 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: '3.27.3'
+  APP_NAME: logcat_reader
+
+jobs:
+  version:
+    name: Validate tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+    steps:
+      - id: parse
+        name: Parse vA.B.C
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          if [[ ! "$tag" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "::error::Tag '$tag' does not match vA.B.C"
+            exit 1
+          fi
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build (${{ matrix.platform }})
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-22.04
+          - platform: windows
+            os: windows-latest
+          - platform: macos
+            os: macos-latest
+    runs-on: ${{ matrix.os }}
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Fetch dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Build
+        shell: bash
+        run: >-
+          flutter build ${{ matrix.platform }} --release
+          --build-name "$VERSION"
+          --build-number "${{ github.run_number }}"
+
+      - name: Package (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          mkdir -p dist
+          cp -r build/linux/x64/release/bundle "dist/${APP_NAME}"
+          tar -C dist -czf "${APP_NAME}-${VERSION}-linux-x64.tar.gz" "${APP_NAME}"
+
+      - name: Package (Windows)
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item -Recurse build/windows/x64/runner/Release "dist/$env:APP_NAME"
+          Compress-Archive -Path "dist/$env:APP_NAME" `
+            -DestinationPath "$env:APP_NAME-$env:VERSION-windows-x64.zip"
+
+      - name: Package (macOS)
+        if: matrix.platform == 'macos'
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            "build/macos/Build/Products/Release/${APP_NAME}.app" \
+            "${APP_NAME}-${VERSION}-macos.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}
+          path: |
+            ${{ env.APP_NAME }}-*.tar.gz
+            ${{ env.APP_NAME }}-*.zip
+          if-no-files-found: error
+
+  release:
+    name: Create release
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Checksums
+        working-directory: artifacts
+        run: sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Logcat Reader ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: artifacts/*
+          body: |
+            ## Downloads
+
+            | Platform | File |
+            |----------|------|
+            | Linux (x64) | `logcat_reader-${{ needs.version.outputs.version }}-linux-x64.tar.gz` — extract and run `logcat_reader/logcat_reader` (needs GTK 3) |
+            | Windows (x64) | `logcat_reader-${{ needs.version.outputs.version }}-windows-x64.zip` — extract and run `logcat_reader.exe` |
+            | macOS (Universal) | `logcat_reader-${{ needs.version.outputs.version }}-macos.zip` — unsigned: right-click → Open on first launch, or `xattr -dr com.apple.quarantine logcat_reader.app` |
+
+            `adb` must be on `PATH` (or set the `ADB` environment variable).
