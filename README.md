@@ -89,6 +89,7 @@ saved with `shared_preferences`.
 | Setting | Options |
 |---------|---------|
 | adb executable | Path to `adb`, with a file picker and version check; empty (default) uses `$ADB`, then `adb` on `PATH` |
+| Run adb as root | off (default) / on — runs `adb root` before reading device logs and again after a reboot, so logcat, `ps` and shell commands run as root. Only works on `userdebug`/`eng` builds; a failure is reported and logging continues as non-root. Toggling it while streaming restarts adbd (`adb root`/`adb unroot`) and resumes logcat. When off, adbd is left in its current mode on connect |
 | Auto-reconnect | on (default) / off |
 | Theme | System (default) / Light / Dark |
 | Long lines | Ellipsis (default) / Wrap |

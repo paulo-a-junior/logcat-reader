@@ -308,6 +308,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String notifyRootFailed(String source, String message) {
+    return 'Could not switch adbd mode on $source: $message';
+  }
+
+  @override
   String notifyRebooted(String source) {
     return '$source rebooted — logcat resumed';
   }
@@ -332,6 +337,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sectionDevice => 'Device';
+
+  @override
+  String get adbRoot => 'Run adb as root';
+
+  @override
+  String get adbRootSubtitle => 'Restart adbd with adb root before reading logs (userdebug/eng builds only)';
 
   @override
   String get autoReconnect => 'Auto-reconnect';

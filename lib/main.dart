@@ -74,6 +74,9 @@ class _LogcatReaderAppState extends State<LogcatReaderApp> {
     if (_controller.autoReconnect != _settings.autoReconnect) {
       _controller.autoReconnect = _settings.autoReconnect;
     }
+    if (_controller.runAsRoot != _settings.adbRoot) {
+      _controller.runAsRoot = _settings.adbRoot;
+    }
     final adb = _controller.adb;
     if (adb.customPath != _settings.adbPath) {
       adb.customPath = _settings.adbPath;

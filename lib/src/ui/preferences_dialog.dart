@@ -37,6 +37,13 @@ class PreferencesDialog extends StatelessWidget {
                 _AdbPathField(settings: settings),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.adbRoot),
+                  subtitle: Text(l10n.adbRootSubtitle),
+                  value: settings.adbRoot,
+                  onChanged: (v) => settings.adbRoot = v,
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
                   title: Text(l10n.autoReconnect),
                   subtitle: Text(l10n.autoReconnectSubtitle),
                   value: settings.autoReconnect,

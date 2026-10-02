@@ -128,6 +128,9 @@ class _HomePageState extends State<HomePage> {
           label: l10n.show,
           onPressed: () => _revealInRaw(entry.lineNumber),
         );
+      case RootFailedEvent(:final source, message: final detail):
+        message = l10n.notifyRootFailed(source, detail);
+        error = true;
     }
 
     ScaffoldMessenger.of(context)

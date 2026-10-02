@@ -223,6 +223,17 @@
       }
     }
   },
+  "notifyRootFailed": "Could not switch adbd mode on {source}: {message}",
+  "@notifyRootFailed": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "notifyRebooted": "{source} rebooted — logcat resumed",
   "@notifyRebooted": {
     "placeholders": {
@@ -257,6 +268,8 @@
   },
   "show": "Show",
   "sectionDevice": "Device",
+  "adbRoot": "Run adb as root",
+  "adbRootSubtitle": "Restart adbd with adb root before reading logs (userdebug/eng builds only)",
   "autoReconnect": "Auto-reconnect",
   "autoReconnectSubtitle": "Resume logcat when the device disconnects or reboots",
   "adbPath": "adb executable",

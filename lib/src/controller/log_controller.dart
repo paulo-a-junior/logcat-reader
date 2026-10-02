@@ -105,6 +105,27 @@ class LogController extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _runAsRoot = false;
+
+  /// Set after `adb root` failed for the current device (e.g. a production
+  /// build), so reconnects do not retry it.
+  bool _rootFailed = false;
+
+  /// Restart adbd as root (`adb root`) before reading device logs. Changing
+  /// it while streaming restarts adbd in the new mode (`adb root` or
+  /// `adb unroot`) and resumes logcat.
+  bool get runAsRoot => _runAsRoot;
+
+  set runAsRoot(bool value) {
+    if (value == _runAsRoot) return;
+    _runAsRoot = value;
+    _rootFailed = false;
+    if (sourceKind == SourceKind.device && active && _serial != null) {
+      unawaited(_restartAdbd());
+    }
+    notifyListeners();
+  }
+
   /// Streaming or waiting to reconnect; i.e. "Stop" is meaningful.
   bool get active => running || reconnecting;
 
@@ -193,6 +214,10 @@ class LogController extends ChangeNotifier {
     status = StatusStarting(sourceLabel);
     notifyListeners();
 
+    if (_runAsRoot) {
+      await _ensureRoot(serial);
+      if (generation != _generation) return;
+    }
     unawaited(_refreshProcessNames(force: true));
     _bootId = await adb.bootId(serial).catchError((_) => null);
     _crashBaseline = await adb.deviceTime(serial).catchError((_) => null);
@@ -256,7 +281,52 @@ class LogController extends ChangeNotifier {
 
   /// Waits until [_serial] is back online (running `adb connect` for
   /// network devices) and resumes logcat where it left off.
-  Future<void> _reconnect(int generation, {bool delayFirst = false}) async {
+  /// Puts adbd in root mode; reports a failure once per device session.
+  Future<void> _ensureRoot(String serial) async {
+    if (_rootFailed) return;
+    try {
+      await adb.setRoot(serial, true);
+    } on AdbException catch (e) {
+      _rootFailed = true;
+      _emit(RootFailedEvent(sourceLabel, e.message));
+    }
+  }
+
+  /// Restarts adbd according to [runAsRoot] and resumes logcat.
+  Future<void> _restartAdbd() async {
+    final serial = _serial!;
+    final root = _runAsRoot;
+    _generation++;
+    final generation = _generation;
+    await _subscription?.cancel();
+    _subscription = null;
+    _process?.kill();
+    _process = null;
+    _flush();
+    running = false;
+    reconnecting = true;
+    status = StatusStarting(sourceLabel);
+    notifyListeners();
+
+    if (root) {
+      await _ensureRoot(serial);
+    } else {
+      try {
+        await adb.setRoot(serial, false);
+      } on AdbException catch (e) {
+        _emit(RootFailedEvent(sourceLabel, e.message));
+      }
+    }
+    if (generation != _generation) return;
+    await _reconnect(generation,
+        announce: false,
+        marker: root ? 'adbd restarted as root' : 'adbd restarted as non-root');
+  }
+
+  /// [marker] replaces the "reconnected" line added to the log; with
+  /// [announce] false no [ReconnectedEvent] is sent.
+  Future<void> _reconnect(int generation,
+      {bool delayFirst = false, bool announce = true, String? marker}) async {
     final serial = _serial!;
     final isNetwork = serial.contains(':');
     reconnecting = true;
@@ -284,6 +354,11 @@ class LogController extends ChangeNotifier {
     }
     if (generation != _generation) return;
 
+    // adbd comes back as non-root after a reboot.
+    if (_runAsRoot) {
+      await _ensureRoot(serial);
+      if (generation != _generation) return;
+    }
     final bootId = await adb.bootId(serial).catchError((_) => null);
     if (generation != _generation) return;
     final rebooted = bootId != null && _bootId != null && bootId != _bootId;
@@ -291,7 +366,7 @@ class LogController extends ChangeNotifier {
     _crashBaseline =
         await adb.deviceTime(serial).catchError((_) => null) ?? _crashBaseline;
     if (generation != _generation) return;
-    _emit(ReconnectedEvent(sourceLabel, rebooted: rebooted));
+    if (announce) _emit(ReconnectedEvent(sourceLabel, rebooted: rebooted));
 
     String? since;
     if (rebooted) {
@@ -300,7 +375,8 @@ class LogController extends ChangeNotifier {
         ..clear()
         ..add(0);
     } else {
-      _pending.add('--------- reconnected to $sourceLabel ---------');
+      _pending.add('--------- ${marker ?? 'reconnected to $sourceLabel'} '
+          '---------');
       since = entries.reversed
           .map((e) => e.timestamp)
           .firstWhere((t) => t != null, orElse: () => null);
@@ -428,6 +504,7 @@ class LogController extends ChangeNotifier {
     _resumeSkip = const {};
     _crashBaseline = null;
     _lastCrashEvent.clear();
+    _rootFailed = false;
     status = null;
   }
 

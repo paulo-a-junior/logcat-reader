@@ -355,6 +355,49 @@ class AdbClient {
     return '${result.stdout}${result.stderr}'.trim();
   }
 
+  /// Whether adbd on [serial] runs as root (shell commands get uid 0).
+  Future<bool> isRoot(String serial) async {
+    final result = await _run(['-s', serial, 'shell', 'id', '-u']);
+    return result.exitCode == 0 && (result.stdout as String).trim() == '0';
+  }
+
+  /// Restarts adbd on [serial] as root (`adb root`) or as the shell user
+  /// (`adb unroot`) and waits for the device to come back. Throws with
+  /// adb's message if adbd did not end up in the requested mode, e.g.
+  /// "adbd cannot run as root in production builds".
+  Future<void> setRoot(String serial, bool root) async {
+    if (await isRoot(serial) == root) return;
+    final result = await _run(['-s', serial, root ? 'root' : 'unroot']);
+    final out = '${result.stdout}${result.stderr}'.trim();
+    await waitOnline(serial);
+    if (await isRoot(serial) != root) {
+      throw AdbException(
+          out.isNotEmpty ? out : 'adb ${root ? 'root' : 'unroot'} failed');
+    }
+  }
+
+  /// Polls until [serial] is online, reconnecting network devices, for at
+  /// most [timeout]. Returns whether the device came back.
+  Future<bool> waitOnline(String serial,
+      {Duration timeout = const Duration(seconds: 20)}) async {
+    final isNetwork = serial.contains(':');
+    final deadline = DateTime.now().add(timeout);
+    var polls = 0;
+    while (true) {
+      final device = (await devices().catchError((_) => <AdbDevice>[]))
+          .where((d) => d.serial == serial)
+          .firstOrNull;
+      if (device != null && device.isOnline) return true;
+      if (DateTime.now().isAfter(deadline)) return false;
+      // adb usually re-attaches TCP devices by itself after adbd restarts;
+      // give it a moment before reconnecting explicitly.
+      if (isNetwork && ++polls % 6 == 0) {
+        await connect(serial).catchError((_) => '');
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    }
+  }
+
   /// The kernel boot id; changes whenever the device reboots.
   Future<String?> bootId(String serial) async {
     final result = await _run(

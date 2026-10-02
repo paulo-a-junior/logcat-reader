@@ -491,6 +491,12 @@ abstract class AppLocalizations {
   /// **'Reconnected to {source}'**
   String notifyReconnected(String source);
 
+  /// No description provided for @notifyRootFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not switch adbd mode on {source}: {message}'**
+  String notifyRootFailed(String source, String message);
+
   /// No description provided for @notifyRebooted.
   ///
   /// In en, this message translates to:
@@ -526,6 +532,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Device'**
   String get sectionDevice;
+
+  /// No description provided for @adbRoot.
+  ///
+  /// In en, this message translates to:
+  /// **'Run adb as root'**
+  String get adbRoot;
+
+  /// No description provided for @adbRootSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart adbd with adb root before reading logs (userdebug/eng builds only)'**
+  String get adbRootSubtitle;
 
   /// No description provided for @autoReconnect.
   ///

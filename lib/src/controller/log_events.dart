@@ -76,6 +76,12 @@ class ReconnectedEvent extends LogEvent {
 
 enum CrashKind { java, anr, native }
 
+/// `adb root` or `adb unroot` did not take effect; [message] is adb's.
+class RootFailedEvent extends LogEvent {
+  const RootFailedEvent(super.source, this.message);
+  final String message;
+}
+
 class CrashEvent extends LogEvent {
   const CrashEvent(super.source, this.kind, this.process, this.entry);
   final CrashKind kind;

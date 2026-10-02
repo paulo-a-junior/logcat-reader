@@ -28,6 +28,7 @@ class AppSettings extends ChangeNotifier {
   static const _kNotifyCrash = 'notifyCrash';
   static const _kLanguage = 'language';
   static const _kAdbPath = 'adbPath';
+  static const _kAdbRoot = 'adbRoot';
 
   final SharedPreferences _prefs;
 
@@ -40,10 +41,12 @@ class AppSettings extends ChangeNotifier {
   late bool _notifyCrash;
   late String? _language;
   late String? _adbPath;
+  late bool _adbRoot;
 
   void _load() {
     final adbPath = _prefs.getString(_kAdbPath)?.trim();
     _adbPath = adbPath == null || adbPath.isEmpty ? null : adbPath;
+    _adbRoot = _prefs.getBool(_kAdbRoot) ?? false;
     _autoReconnect = _prefs.getBool(_kAutoReconnect) ?? true;
     _longLineMode =
         LongLineMode.values.asNameMap()[_prefs.getString(_kLongLineMode)] ??
@@ -70,6 +73,7 @@ class AppSettings extends ChangeNotifier {
       _kNotifyCrash,
       _kLanguage,
       _kAdbPath,
+      _kAdbRoot,
     ]) {
       await _prefs.remove(key);
     }
@@ -89,6 +93,15 @@ class AppSettings extends ChangeNotifier {
     } else {
       _prefs.setString(_kAdbPath, v);
     }
+    notifyListeners();
+  }
+
+  /// Run adbd as root (`adb root`) when reading device logs.
+  bool get adbRoot => _adbRoot;
+  set adbRoot(bool v) {
+    if (v == _adbRoot) return;
+    _adbRoot = v;
+    _prefs.setBool(_kAdbRoot, v);
     notifyListeners();
   }
 
