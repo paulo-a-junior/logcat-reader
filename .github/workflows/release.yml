@@ -39,7 +39,9 @@ jobs:
           - platform: linux
             os: ubuntu-22.04
           - platform: windows
-            os: windows-latest
+            # Flutter 3.27 only knows the VS 2019/2022 CMake generators;
+            # windows-latest ships VS 2026, so pin the VS 2022 image.
+            os: windows-2022
           - platform: macos
             os: macos-latest
     runs-on: ${{ matrix.os }}
