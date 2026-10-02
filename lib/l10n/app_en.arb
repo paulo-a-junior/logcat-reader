@@ -1,0 +1,502 @@
+{
+  "@@locale": "en",
+  "appTitle": "Logcat Reader",
+  "selectDevice": "Select a device",
+  "noDevicesFound": "No devices found",
+  "refreshDevices": "Refresh devices",
+  "connectViaIp": "Connect via IP (adb connect)",
+  "startLogcat": "Start logcat",
+  "stop": "Stop",
+  "openFile": "Open file",
+  "clearLogs": "Clear logs",
+  "preferences": "Preferences",
+  "fileTypeLogs": "Log files",
+  "fileTypeAll": "All files",
+  "connectDialogTitle": "Connect via IP",
+  "address": "Address",
+  "cancel": "Cancel",
+  "connect": "Connect",
+  "columnLine": "Line",
+  "columnProcess": "Process Name",
+  "columnMessage": "Log Message",
+  "tableRaw": "Raw",
+  "tableFiltered": "Filtered",
+  "lineCount": "{count, plural, =1{1 line} other{{count} lines}}",
+  "@lineCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "followingNewLines": "Following new lines",
+  "followNewLines": "Follow new lines",
+  "filterMessage": "Message",
+  "filterMessageHintText": "Text",
+  "filterMessageHintRegex": "Regular expression",
+  "regularExpression": "Regular expression",
+  "caseSensitive": "Case sensitive",
+  "filterProcess": "Process",
+  "filterProcessHint": "Name or PID",
+  "filterTag": "Tag",
+  "filterMinLevel": "Min level",
+  "levelVerbose": "Verbose",
+  "levelDebug": "Debug",
+  "levelInfo": "Info",
+  "levelWarn": "Warning",
+  "levelError": "Error",
+  "levelFatal": "Fatal",
+  "statusStarting": "Starting logcat on {source}…",
+  "@statusStarting": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "statusStreaming": "Streaming from {source}",
+  "@statusStreaming": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "statusEnded": "logcat on {source} ended",
+  "@statusEnded": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "statusReconnecting": "Connection to {source} lost — reconnecting (attempt {attempt})…",
+  "@statusReconnecting": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "attempt": {
+        "type": "int"
+      }
+    }
+  },
+  "statusStopped": "Stopped",
+  "statusLoading": "Loading {path}…",
+  "@statusLoading": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "statusLoaded": "{count, plural, =1{Loaded 1 line from {path}} other{Loaded {count} lines from {path}}}",
+  "@statusLoaded": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "statusReadFailed": "Failed to read {path}: {error}",
+  "@statusReadFailed": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "adbNotFound": "Could not run \"{adb}\". Make sure adb is on PATH or set the ADB environment variable.",
+  "@adbNotFound": {
+    "placeholders": {
+      "adb": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyConnectionLost": "Connection to {source} lost",
+  "@notifyConnectionLost": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyReconnected": "Reconnected to {source}",
+  "@notifyReconnected": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyRebooted": "{source} rebooted — logcat resumed",
+  "@notifyRebooted": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyJavaCrash": "Crash (FATAL EXCEPTION) in {process}",
+  "@notifyJavaCrash": {
+    "placeholders": {
+      "process": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyAnr": "ANR in {process}",
+  "@notifyAnr": {
+    "placeholders": {
+      "process": {
+        "type": "String"
+      }
+    }
+  },
+  "notifyNativeCrash": "Native crash in {process}",
+  "@notifyNativeCrash": {
+    "placeholders": {
+      "process": {
+        "type": "String"
+      }
+    }
+  },
+  "show": "Show",
+  "sectionDevice": "Device",
+  "autoReconnect": "Auto-reconnect",
+  "autoReconnectSubtitle": "Resume logcat when the device disconnects or reboots",
+  "sectionDisplay": "Display",
+  "longLines": "Long lines",
+  "longLinesEllipsis": "Ellipsis",
+  "longLinesWrap": "Wrap",
+  "theme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "fontSize": "Log font size",
+  "sectionNotifications": "Notifications",
+  "notifyOnConnectionLost": "Connection lost",
+  "notifyOnReconnected": "Reconnected",
+  "notifyOnCrash": "App crashes",
+  "notifyOnCrashSubtitle": "FATAL EXCEPTION, ANR and native crashes in live logs",
+  "language": "Language",
+  "languageSystem": "System default",
+  "resetDefaults": "Reset to defaults",
+  "close": "Close",
+  "filters": "Filters",
+  "manageFilters": "Manage filters",
+  "addFilter": "Add filter",
+  "newFilterName": "New filter",
+  "editFilter": "Edit filter",
+  "duplicateFilter": "Duplicate",
+  "deleteFilter": "Delete",
+  "deleteFilterTitle": "Delete filter?",
+  "deleteFilterConfirm": "The filter \"{name}\" will be removed.",
+  "@deleteFilterConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "filterCopyName": "{name} (copy)",
+  "@filterCopyName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "edit": "Edit",
+  "save": "Save",
+  "filterName": "Name",
+  "filterColor": "Colour",
+  "filterMode": "Matching lines",
+  "filterModeInclude": "Show",
+  "filterModeExclude": "Hide",
+  "filterCriteria": "Criteria",
+  "combineAny": "Any",
+  "combineAll": "All",
+  "combineTooltip": "Show lines matching any or all of the enabled filters",
+  "enableAllFilters": "Enable all",
+  "disableAllFilters": "Disable all",
+  "noFilterSelected": "Select a filter to edit it, or add a new one.",
+  "noFilters": "No filters yet",
+  "noActiveFilters": "No filter enabled — enable a filter to see lines",
+  "summaryMatchesAll": "Matches every line",
+  "summaryLevel": "level ≥ {level}",
+  "@summaryLevel": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryTag": "tag: {tag}",
+  "@summaryTag": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryProcess": "process: {process}",
+  "@summaryProcess": {
+    "placeholders": {
+      "process": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryExclude": "hides matches",
+  "invalidRegex": "Invalid regular expression: {error}",
+  "@invalidRegex": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "filterEnabled": "Enabled",
+  "navLogs": "Logs",
+  "navApps": "Apps",
+  "navFiles": "Files",
+  "navShell": "Shell",
+  "navShortcuts": "Shortcuts",
+  "noDeviceSelected": "Select a connected device in the toolbar to use this view.",
+  "deviceMenu": "Device actions",
+  "reboot": "Reboot",
+  "rebootRecovery": "Reboot to recovery",
+  "rebootBootloader": "Reboot to bootloader",
+  "rebootConfirmTitle": "Reboot device?",
+  "rebootConfirm": "{device} will restart ({mode}).",
+  "@rebootConfirm": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      },
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
+  "rebootSent": "Reboot command sent to {device}",
+  "@rebootSent": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "takeScreenshot": "Take screenshot…",
+  "screenshotSaved": "Screenshot saved to {path}",
+  "@screenshotSaved": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "installApk": "Install APK…",
+  "installing": "Installing {name}…",
+  "@installing": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "installed": "{name} installed",
+  "@installed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fileTypeApk": "Android packages",
+  "fileTypePng": "PNG images",
+  "refresh": "Refresh",
+  "searchPackages": "Search packages",
+  "showSystemApps": "System apps",
+  "systemBadge": "system",
+  "packageCount": "{count, plural, =1{1 package} other{{count} packages}}",
+  "@packageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "launchApp": "Launch",
+  "forceStop": "Force stop",
+  "clearData": "Clear data",
+  "uninstall": "Uninstall",
+  "saveApk": "Save APK…",
+  "uninstallTitle": "Uninstall {name}?",
+  "@uninstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "clearDataTitle": "Clear data of {name}?",
+  "@clearDataTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cannotUndo": "This cannot be undone.",
+  "doneMessage": "{action}: {name}",
+  "@doneMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "goUp": "Parent folder",
+  "path": "Path",
+  "pushFiles": "Push files…",
+  "pull": "Pull…",
+  "newFolder": "New folder",
+  "folderName": "Folder name",
+  "create": "Create",
+  "delete": "Delete",
+  "deleteFileTitle": "Delete {name}?",
+  "@deleteFileTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyFolder": "This folder is empty",
+  "columnName": "Name",
+  "columnSize": "Size",
+  "columnModified": "Modified",
+  "transferring": "Transferring {name}…",
+  "@transferring": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pushDone": "{count, plural, =1{1 file sent to {path}} other{{count} files sent to {path}}}",
+  "@pushDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "pullDone": "Saved to {path}",
+  "@pullDone": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "shellHint": "Command to run on the device (adb shell) — ↑/↓ for history",
+  "run": "Run",
+  "clearConsole": "Clear finished",
+  "exitCode": "exit {code}",
+  "@exitCode": {
+    "placeholders": {
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "stopped": "stopped",
+  "running": "running…",
+  "outputTruncated": "(output truncated)",
+  "consoleEmpty": "Run a command or a shortcut to see its output here.",
+  "copyOutput": "Copy output",
+  "copied": "Copied",
+  "addShortcut": "Add shortcut",
+  "editShortcut": "Edit shortcut",
+  "newShortcutName": "New shortcut",
+  "deleteShortcutTitle": "Delete shortcut?",
+  "deleteShortcutConfirm": "The shortcut \"{name}\" will be removed.",
+  "@deleteShortcutConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "manageShortcuts": "Manage shortcuts…",
+  "noShortcuts": "No shortcuts yet",
+  "shortcutName": "Name",
+  "shortcutCommand": "Command",
+  "shortcutKind": "Runs",
+  "kindShell": "adb shell",
+  "kindAdb": "adb",
+  "kindHost": "This computer",
+  "kindShellHint": "Runs in the device shell, e.g. input keyevent KEYCODE_HOME",
+  "kindAdbHint": "adb arguments for the selected device, e.g. install -r /path/app.apk",
+  "kindHostHint": "Command or script on this computer; ANDROID_SERIAL and ADB are set",
+  "shortcutOutput": "When finished",
+  "outputNotify": "Notify",
+  "outputConsole": "Open Shell view",
+  "shortcutConfirm": "Ask before running",
+  "shortcutPinned": "Show in toolbar",
+  "shortcutIcon": "Icon",
+  "runShortcutTitle": "Run \"{name}\"?",
+  "@runShortcutTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutDone": "{name}: done",
+  "@shortcutDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shortcutFailed": "{name} failed (exit {code})",
+  "@shortcutFailed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "shortcutNeedsDevice": "Select a connected device to run \"{name}\"",
+  "@shortcutNeedsDevice": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commandRequired": "Enter a command"
+}
