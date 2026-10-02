@@ -10,6 +10,9 @@ few everyday adb tools on the side.
   a TCP/IP device (`adb connect host:port` via the Wi-Fi button).
 - **Offline viewing** — open a saved log file (`threadtime`, `time` and
   `brief` formats are parsed; any other line is shown verbatim).
+  UTF-16 and UTF-32 files (e.g. `adb logcat > log.txt` in Windows
+  PowerShell 5) are detected by BOM or byte pattern and converted in
+  memory, with a warning; the file itself is not modified.
 - **Two tables**, each with *Line*, *Process Name* and *Log Message* columns:
   - **Raw** (top) — every line.
   - **Filtered** (bottom) — only lines matching the enabled filters (empty

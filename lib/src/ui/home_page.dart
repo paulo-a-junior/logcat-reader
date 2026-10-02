@@ -105,6 +105,7 @@ class _HomePageState extends State<HomePage> {
     String? message;
     SnackBarAction? action;
     var error = false;
+    var warning = false;
 
     switch (event) {
       case ConnectionLostEvent(:final source):
@@ -131,6 +132,9 @@ class _HomePageState extends State<HomePage> {
       case RootFailedEvent(:final source, message: final detail):
         message = l10n.notifyRootFailed(source, detail);
         error = true;
+      case WideEncodingEvent(:final encoding):
+        message = l10n.notifyWideEncoding(encoding);
+        warning = true;
     }
 
     ScaffoldMessenger.of(context)
@@ -138,16 +142,33 @@ class _HomePageState extends State<HomePage> {
       ..showSnackBar(SnackBar(
         content: Row(
           children: [
-            Icon(error ? Icons.error_outline : Icons.check_circle_outline,
-                color: error ? colors.onErrorContainer : null),
+            Icon(
+                error
+                    ? Icons.error_outline
+                    : warning
+                        ? Icons.warning_amber
+                        : Icons.check_circle_outline,
+                color: error
+                    ? colors.onErrorContainer
+                    : warning
+                        ? colors.onTertiaryContainer
+                        : null),
             const SizedBox(width: 12),
-            Expanded(child: Text(message)),
+            Expanded(
+                child: Text(message,
+                    style: warning
+                        ? TextStyle(color: colors.onTertiaryContainer)
+                        : null)),
           ],
         ),
-        backgroundColor: error ? colors.errorContainer : null,
+        backgroundColor: error
+            ? colors.errorContainer
+            : warning
+                ? colors.tertiaryContainer
+                : null,
         behavior: SnackBarBehavior.floating,
         width: 520,
-        duration: Duration(seconds: action != null ? 8 : 4),
+        duration: Duration(seconds: action != null || warning ? 8 : 4),
         action: action,
       ));
   }

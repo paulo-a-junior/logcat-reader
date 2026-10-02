@@ -9,6 +9,7 @@ import '../models/log_entry.dart';
 import '../models/log_filter.dart';
 import '../parsing/logcat_parser.dart';
 import 'log_events.dart';
+import 'text_encoding.dart';
 
 export 'log_events.dart';
 
@@ -430,9 +431,22 @@ class LogController extends ChangeNotifier {
       notifyListeners();
     }
 
-    _subscription = File(path)
-        .openRead()
-        .transform(const Utf8Decoder(allowMalformed: true))
+    final file = File(path);
+    DetectedEncoding detected;
+    try {
+      detected = await detectEncoding(file);
+    } on FileSystemException catch (e) {
+      finish(() => StatusReadFailed(path, '$e'));
+      return;
+    }
+    if (generation != _generation) return;
+    if (detected.encoding.isWide) {
+      _emit(WideEncodingEvent(path, detected.encoding.label));
+    }
+
+    _subscription = file
+        .openRead(detected.bomLength)
+        .transform(detected.encoding.decoder)
         .transform(const LineSplitter())
         .listen(
           _pending.add,

@@ -313,6 +313,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String notifyWideEncoding(String encoding) {
+    return 'Este ficheiro está em $encoding, não em UTF-8. Foi convertido para visualização; o ficheiro no disco não foi alterado.';
+  }
+
+  @override
   String notifyRebooted(String source) {
     return '$source reiniciou — logcat retomado';
   }

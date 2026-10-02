@@ -88,3 +88,10 @@ class CrashEvent extends LogEvent {
   final String process;
   final LogEntry entry;
 }
+
+/// A log file was not UTF-8; it is converted while loading, in memory
+/// only. [encoding] is the detected encoding, e.g. `UTF-16LE`.
+class WideEncodingEvent extends LogEvent {
+  const WideEncodingEvent(super.source, this.encoding);
+  final String encoding;
+}

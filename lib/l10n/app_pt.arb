@@ -66,6 +66,7 @@
   "adbNotFound": "Não foi possível executar \"{adb}\". Escolha o executável do adb nas Preferências, coloque o adb no PATH ou defina a variável de ambiente ADB.",
   "notifyConnectionLost": "Ligação a {source} perdida",
   "notifyReconnected": "Religado a {source}",
+  "notifyWideEncoding": "Este ficheiro está em {encoding}, não em UTF-8. Foi convertido para visualização; o ficheiro no disco não foi alterado.",
   "notifyRootFailed": "Não foi possível mudar o modo do adbd em {source}: {message}",
   "notifyRebooted": "{source} reiniciou — logcat retomado",
   "notifyJavaCrash": "Falha (FATAL EXCEPTION) em {process}",

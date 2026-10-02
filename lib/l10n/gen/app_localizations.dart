@@ -497,6 +497,12 @@ abstract class AppLocalizations {
   /// **'Could not switch adbd mode on {source}: {message}'**
   String notifyRootFailed(String source, String message);
 
+  /// No description provided for @notifyWideEncoding.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is {encoding}, not UTF-8. It was converted for viewing; the file on disk is unchanged.'**
+  String notifyWideEncoding(String encoding);
+
   /// No description provided for @notifyRebooted.
   ///
   /// In en, this message translates to:
