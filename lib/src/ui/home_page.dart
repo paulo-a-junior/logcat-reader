@@ -16,6 +16,7 @@ import 'filters/filter_manager_page.dart';
 import 'l10n_helpers.dart';
 import 'log_table.dart';
 import 'preferences_dialog.dart';
+import 'save_log.dart';
 import 'source_toolbar.dart';
 import 'tools/apps_view.dart';
 import 'tools/device_menu.dart';
@@ -95,6 +96,8 @@ class _HomePageState extends State<HomePage> {
 
   void _openPreferences() => PreferencesDialog.show(context, _settings);
 
+  void _saveLog() => saveLog(context, _c);
+
   void _notify(LogEvent event) {
     if (!mounted) return;
     final l10n = context.l10n;
@@ -154,6 +157,8 @@ class _HomePageState extends State<HomePage> {
             _openPreferences,
         const SingleActivator(LogicalKeyboardKey.comma, meta: true):
             _openPreferences,
+        const SingleActivator(LogicalKeyboardKey.keyS, control: true): _saveLog,
+        const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _saveLog,
       },
       child: Focus(
         autofocus: true,

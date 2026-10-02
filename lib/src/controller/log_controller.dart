@@ -389,6 +389,29 @@ class LogController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Writes the raw text of all lines, or only the filtered ones, to [path]
+  /// and returns how many lines were written. The output can be reopened
+  /// with [openFile].
+  Future<int> saveTo(String path, {bool filteredOnly = false}) async {
+    // Snapshot first: a live source keeps appending while we write.
+    final lines = filteredOnly
+        ? [for (final i in filtered) entries[i].raw]
+        : [for (final e in entries) e.raw];
+    final sink = File(path).openWrite();
+    try {
+      const chunk = 4096;
+      for (var i = 0; i < lines.length; i += chunk) {
+        final end = i + chunk < lines.length ? i + chunk : lines.length;
+        sink.write(lines.sublist(i, end).join('\n'));
+        sink.write('\n');
+        await sink.flush();
+      }
+    } finally {
+      await sink.close();
+    }
+    return lines.length;
+  }
+
   void _reset() {
     entries.clear();
     filtered.clear();

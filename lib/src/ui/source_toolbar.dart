@@ -5,6 +5,7 @@ import '../adb/adb_client.dart';
 import '../adb/device_selection.dart';
 import '../controller/log_controller.dart';
 import 'l10n_helpers.dart';
+import 'save_log.dart';
 
 /// Source selection: adb device (USB or TCP/IP) or an offline log file.
 class SourceToolbar extends StatefulWidget {
@@ -152,6 +153,30 @@ class _SourceToolbarState extends State<SourceToolbar> {
             label: Text(l10n.openFile),
           ),
           const SizedBox(width: 8),
+          PopupMenuButton<bool>(
+            tooltip: l10n.saveLog,
+            enabled: _c.entries.isNotEmpty,
+            icon: const Icon(Icons.save_alt),
+            onSelected: (filteredOnly) =>
+                saveLog(context, _c, filteredOnly: filteredOnly),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: false,
+                child: ListTile(
+                  leading: const Icon(Icons.subject),
+                  title: Text(l10n.saveAllLines(_c.entries.length)),
+                ),
+              ),
+              PopupMenuItem(
+                value: true,
+                enabled: _c.filtered.isNotEmpty,
+                child: ListTile(
+                  leading: const Icon(Icons.filter_alt),
+                  title: Text(l10n.saveFilteredLines(_c.filtered.length)),
+                ),
+              ),
+            ],
+          ),
           IconButton(
             tooltip: l10n.clearLogs,
             onPressed: _c.entries.isEmpty ? null : _c.clear,

@@ -86,6 +86,47 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get saveLog => 'Guardar registo';
+
+  @override
+  String saveAllLines(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Guardar todas as linhas ($countString)…';
+  }
+
+  @override
+  String saveFilteredLines(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Guardar linhas filtradas ($countString)…';
+  }
+
+  @override
+  String get saveLogEmpty => 'Não há linhas para guardar';
+
+  @override
+  String saveLogDone(int count, String path) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString linhas guardadas em $path',
+      one: '1 linha guardada em $path',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String saveLogFailed(String path, String error) {
+    return 'Não foi possível guardar $path: $error';
+  }
+
+  @override
   String get followingNewLines => 'A seguir novas linhas';
 
   @override

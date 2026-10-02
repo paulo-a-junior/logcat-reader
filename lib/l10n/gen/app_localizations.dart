@@ -227,6 +227,42 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 line} other{{count} lines}}'**
   String lineCount(int count);
 
+  /// No description provided for @saveLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Save log'**
+  String get saveLog;
+
+  /// No description provided for @saveAllLines.
+  ///
+  /// In en, this message translates to:
+  /// **'Save all lines ({count})…'**
+  String saveAllLines(int count);
+
+  /// No description provided for @saveFilteredLines.
+  ///
+  /// In en, this message translates to:
+  /// **'Save filtered lines ({count})…'**
+  String saveFilteredLines(int count);
+
+  /// No description provided for @saveLogEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no lines to save'**
+  String get saveLogEmpty;
+
+  /// No description provided for @saveLogDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Saved 1 line to {path}} other{Saved {count} lines to {path}}}'**
+  String saveLogDone(int count, String path);
+
+  /// No description provided for @saveLogFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save {path}: {error}'**
+  String saveLogFailed(String path, String error);
+
   /// No description provided for @followingNewLines.
   ///
   /// In en, this message translates to:

@@ -30,6 +30,49 @@
       }
     }
   },
+  "saveLog": "Save log",
+  "saveAllLines": "Save all lines ({count})…",
+  "@saveAllLines": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "saveFilteredLines": "Save filtered lines ({count})…",
+  "@saveFilteredLines": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "saveLogEmpty": "There are no lines to save",
+  "saveLogDone": "{count, plural, =1{Saved 1 line to {path}} other{Saved {count} lines to {path}}}",
+  "@saveLogDone": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "saveLogFailed": "Could not save {path}: {error}",
+  "@saveLogFailed": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "followingNewLines": "Following new lines",
   "followNewLines": "Follow new lines",
   "filterMessage": "Message",

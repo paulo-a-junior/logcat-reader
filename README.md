@@ -15,6 +15,9 @@ few everyday adb tools on the side.
   - **Filtered** (bottom) — only lines matching the enabled filters (empty
     when none is enabled), with a stripe in the matching filter's colour.
     Clicking a row scrolls the raw table to that line.
+- **Save log** — the save button (or <kbd>Ctrl</kbd>+<kbd>S</kbd>) writes
+  all lines, or only the filtered ones, as raw logcat text that can be
+  reopened later.
 - **Filter balloons** — saved filters appear as coloured balloons above the
   filtered table. Click a balloon to toggle it, double-click to edit it;
   right-click (or long-press) to edit, duplicate or delete it;
