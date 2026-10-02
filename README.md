@@ -105,7 +105,9 @@ Pushing a tag of the form `vA.B.C` (e.g. `v1.2.0`) runs
 `.github/workflows/release.yml`, which builds release binaries on Linux,
 Windows and macOS runners and publishes a GitHub release with:
 
-- `logcat_reader-A.B.C-linux-x64.tar.gz`
+- `logcat_reader-A.B.C-linux-x64.tar.gz` (built in an `ubuntu:20.04`
+  container, so it runs on glibc 2.31+: Ubuntu 20.04, Debian 11 and newer;
+  needs GTK 3)
 - `logcat_reader-A.B.C-windows-x64.zip`
 - `logcat_reader-A.B.C-macos.zip` (unsigned `.app`)
 - `SHA256SUMS.txt`
