@@ -16,7 +16,8 @@ import 'l10n_helpers.dart';
 /// Rows can be selected with click, Shift+click, click-and-drag (which
 /// auto-scrolls past the edges) and Ctrl/Cmd+click or drag to add or remove
 /// rows. The selection is kept as line-number ranges, so it survives filter
-/// changes. Right-click or Ctrl+C copies it.
+/// changes. Right-click or Ctrl+C copies it. Arrow keys move the selection
+/// by one row and Page Up/Down by [pageRows]; with Shift they extend it.
 ///
 /// With [wrap] off every row has the same height and a plain [ListView] with
 /// a fixed extent is used; with [wrap] on rows have variable height and
@@ -35,6 +36,9 @@ class LogTable extends StatefulWidget {
     this.controller,
     this.markColorAt,
   });
+
+  /// Rows moved by one Page Up/Down stroke.
+  static const pageRows = 10;
 
   final String title;
   final int itemCount;
@@ -399,11 +403,106 @@ class _LogTableState extends State<LogTable> {
       _selectAll();
       return KeyEventResult.handled;
     }
+    final step = switch (key) {
+      LogicalKeyboardKey.pageUp => -LogTable.pageRows,
+      LogicalKeyboardKey.pageDown => LogTable.pageRows,
+      LogicalKeyboardKey.arrowUp => -1,
+      LogicalKeyboardKey.arrowDown => 1,
+      _ => 0,
+    };
+    if (step != 0 && !command) {
+      _moveCursor(step, extend: keyboard.isShiftPressed);
+      return KeyEventResult.handled;
+    }
     if (key == LogicalKeyboardKey.escape && _hasSelection) {
       setState(() => _selectOnly(null));
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
+  }
+
+  // ---- Keyboard navigation --------------------------------------------
+
+  /// Index of the first row at least partly visible.
+  int _firstVisibleRow() {
+    if (!_vertical.hasClients || widget.itemCount == 0) return 0;
+    if (widget.wrap) {
+      return _list.isAttached ? (_list.visibleRange?.$1 ?? 0) : 0;
+    }
+    return (_vertical.position.pixels / _rowHeight)
+        .floor()
+        .clamp(0, widget.itemCount - 1);
+  }
+
+  /// Row of the selection focus and whether that line is in this table;
+  /// if not, the row is the first one after it. Without a selection, the
+  /// first visible row (not exact).
+  (int, bool) _cursorRow() {
+    final line = _focusLine ?? _anchorLine;
+    if (line == null) return (_firstVisibleRow(), false);
+    final row = _lowerBound(line);
+    return (
+      row,
+      row < widget.itemCount && widget.entryAt(row).lineNumber == line
+    );
+  }
+
+  /// Moves the selection by [delta] rows; [extend] keeps the anchor.
+  void _moveCursor(int delta, {required bool extend}) {
+    if (widget.itemCount == 0) return;
+    final hasCursor = _focusLine != null || _anchorLine != null;
+    final (row, exact) = _cursorRow();
+    final int target;
+    if (!hasCursor) {
+      target = row;
+    } else if (exact) {
+      target = row + delta;
+    } else {
+      // [row] is the first row after the cursor.
+      target = delta > 0 ? row + delta - 1 : row + delta;
+    }
+    final index = target.clamp(0, widget.itemCount - 1);
+    final line = widget.entryAt(index).lineNumber;
+    setState(() {
+      if (extend && _anchorLine != null) {
+        _committed.clear();
+        _focusLine = line;
+      } else {
+        _selectOnly(line);
+      }
+    });
+    if (index < widget.itemCount - 1) _setFollow(false);
+    _ensureVisible(index);
+  }
+
+  /// Scrolls the least amount needed to show row [index] in full.
+  void _ensureVisible(int index) {
+    if (!_vertical.hasClients) return;
+    if (widget.wrap) {
+      if (!_list.isAttached) return;
+      final range = _list.visibleRange;
+      // Edge rows may be cut off, so they are aligned too.
+      if (range == null || index <= range.$1) {
+        _list.jumpToItem(
+            index: index, scrollController: _vertical, alignment: 0);
+      } else if (index >= range.$2) {
+        _list.jumpToItem(
+            index: index, scrollController: _vertical, alignment: 1);
+      }
+      return;
+    }
+    final pos = _vertical.position;
+    final top = index * _rowHeight;
+    final bottom = top + _rowHeight;
+    double? target;
+    if (top < pos.pixels) {
+      target = top;
+    } else if (bottom > pos.pixels + pos.viewportDimension) {
+      target = bottom - pos.viewportDimension;
+    }
+    if (target != null) {
+      _vertical.jumpTo(target.clamp(0.0, pos.maxScrollExtent));
+    }
   }
 
   RenderBox? get _viewport =>

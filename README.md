@@ -28,6 +28,9 @@ few everyday adb tools on the side.
   - Right-click a row to copy the raw line, the message, the process name or
     the whole row (tab-separated); with several rows selected it copies all
     of them. <kbd>Ctrl</kbd>+<kbd>C</kbd> copies the selected raw lines.
+  - Keyboard navigation: <kbd>Page Up</kbd>/<kbd>Page Down</kbd> move the
+    selection 10 lines, <kbd>↑</kbd>/<kbd>↓</kbd> one line; with
+    <kbd>Shift</kbd> they extend it. The table scrolls to keep it visible.
 - **Save log** — the save button (or <kbd>Ctrl</kbd>+<kbd>S</kbd>) writes
   all lines, or only the filtered ones, as raw logcat text that can be
   reopened later.
