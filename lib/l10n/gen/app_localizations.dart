@@ -263,6 +263,36 @@ abstract class AppLocalizations {
   /// **'Could not save {path}: {error}'**
   String saveLogFailed(String path, String error);
 
+  /// No description provided for @copyLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy line'**
+  String get copyLine;
+
+  /// No description provided for @copyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy message'**
+  String get copyMessage;
+
+  /// No description provided for @copyProcessName.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy process name'**
+  String get copyProcessName;
+
+  /// No description provided for @copyRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy row (line, process, message)'**
+  String get copyRow;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
+
   /// No description provided for @followingNewLines.
   ///
   /// In en, this message translates to:

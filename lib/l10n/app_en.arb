@@ -73,6 +73,11 @@
       }
     }
   },
+  "copyLine": "Copy line",
+  "copyMessage": "Copy message",
+  "copyProcessName": "Copy process name",
+  "copyRow": "Copy row (line, process, message)",
+  "copiedToClipboard": "Copied to clipboard",
   "followingNewLines": "Following new lines",
   "followNewLines": "Follow new lines",
   "filterMessage": "Message",

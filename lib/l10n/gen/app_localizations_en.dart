@@ -127,6 +127,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get copyLine => 'Copy line';
+
+  @override
+  String get copyMessage => 'Copy message';
+
+  @override
+  String get copyProcessName => 'Copy process name';
+
+  @override
+  String get copyRow => 'Copy row (line, process, message)';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
   String get followingNewLines => 'Following new lines';
 
   @override

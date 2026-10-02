@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 import '../models/log_entry.dart';
@@ -225,6 +226,41 @@ class _LogTableState extends State<LogTable> {
     );
   }
 
+  Future<void> _showRowMenu(LogEntry entry, Offset position) async {
+    final l10n = context.l10n;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final process = widget.processLabel(entry);
+    final row = '${entry.lineNumber}\t$process\t${entry.displayMessage}';
+
+    PopupMenuItem<String> item(IconData icon, String label, String text) =>
+        PopupMenuItem(
+          value: text,
+          child: ListTile(leading: Icon(icon), title: Text(label)),
+        );
+
+    final text = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+          position & const Size(1, 1), Offset.zero & overlay.size),
+      items: [
+        item(Icons.content_copy, l10n.copyLine, entry.raw),
+        item(Icons.notes, l10n.copyMessage, entry.message),
+        if (process.isNotEmpty)
+          item(Icons.memory, l10n.copyProcessName, process),
+        item(Icons.table_rows_outlined, l10n.copyRow, row),
+      ],
+    );
+    if (text == null) return;
+    await Clipboard.setData(ClipboardData(text: text));
+    messenger
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(l10n.copiedToClipboard),
+        duration: const Duration(seconds: 2),
+      ));
+  }
+
   Widget _buildRow(ThemeData theme, int index) {
     final entry = widget.entryAt(index);
     final selected = entry.lineNumber == widget.selectedLine;
@@ -243,6 +279,7 @@ class _LogTableState extends State<LogTable> {
       color: background ?? Colors.transparent,
       child: InkWell(
         onTap: widget.onRowTap == null ? null : () => widget.onRowTap!(entry),
+        onSecondaryTapUp: (d) => _showRowMenu(entry, d.globalPosition),
         child: Container(
           decoration: BoxDecoration(
             border: Border(

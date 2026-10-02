@@ -127,6 +127,21 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get copyLine => 'Copiar linha';
+
+  @override
+  String get copyMessage => 'Copiar mensagem';
+
+  @override
+  String get copyProcessName => 'Copiar nome do processo';
+
+  @override
+  String get copyRow => 'Copiar linha da tabela (linha, processo, mensagem)';
+
+  @override
+  String get copiedToClipboard => 'Copiado para a área de transferência';
+
+  @override
   String get followingNewLines => 'A seguir novas linhas';
 
   @override

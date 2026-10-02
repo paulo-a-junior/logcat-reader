@@ -15,6 +15,8 @@ few everyday adb tools on the side.
   - **Filtered** (bottom) — only lines matching the enabled filters (empty
     when none is enabled), with a stripe in the matching filter's colour.
     Clicking a row scrolls the raw table to that line.
+  - Right-click a row to copy the raw line, the message, the process name or
+    the whole row (tab-separated).
 - **Save log** — the save button (or <kbd>Ctrl</kbd>+<kbd>S</kbd>) writes
   all lines, or only the filtered ones, as raw logcat text that can be
   reopened later.
